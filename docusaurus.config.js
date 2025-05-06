@@ -13,14 +13,14 @@ const config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://yourusername.github.io',
+  url: 'https://payincgroupltd.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/payangel-api-docs/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'yourusername', // Usually your GitHub org/user name.
+  organizationName: 'payincgroupltd', // Usually your GitHub org/user name.
   projectName: 'payangel-api-docs', // Usually your repo name.
   deploymentBranch: 'gh-pages',
   trailingSlash: false,
@@ -46,7 +46,7 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/yourusername/payangel-api-docs/tree/main/',
+            'https://github.com/payincgroupltd/payangel-api-docs/tree/main/',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -74,7 +74,7 @@ const config = {
             label: 'API',
           },
           {
-            href: 'https://github.com/yourusername/payangel-api-docs',
+            href: 'https://github.com/payincgroupltd/payangel-api-docs',
             label: 'GitHub',
             position: 'right',
           },
@@ -110,7 +110,7 @@ const config = {
             items: [
               {
                 label: 'GitHub',
-                href: 'https://github.com/yourusername/payangel-api-docs',
+                href: 'https://github.com/payincgroupltd/payangel-api-docs',
               },
             ],
           },
