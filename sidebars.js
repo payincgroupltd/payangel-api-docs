@@ -29,6 +29,16 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Collection API',
+      items: [
+        'api/collection/overview',
+        'api/collection/mobile-money',
+        'api/collection/card',
+        'api/collection/status',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Code Samples',
       items: [
         'api/javascript/examples',

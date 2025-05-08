@@ -19,7 +19,7 @@ https://api.payangel.com/v1
 
 All API requests require authentication using API keys. You can obtain your API keys from the PayAngel Developer Dashboard.
 
-[Learn more about authentication →](authentication)
+[Learn more about authentication →](authentication.md)
 
 ## Features
 
