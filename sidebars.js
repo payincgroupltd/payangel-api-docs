@@ -25,6 +25,7 @@ const sidebars = {
         'api/disbursement/single-transaction',
         'api/disbursement/bulk-transaction',
         'api/disbursement/status',
+        'api/disbursement/bank-codes',
       ],
     },
     {
