@@ -25,6 +25,17 @@ const sidebars = {
         'api/disbursement/single-transaction',
         'api/disbursement/bulk-transaction',
         'api/disbursement/status',
+        'api/disbursement/bank-codes',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Collection API',
+      items: [
+        'api/collection/overview',
+        'api/collection/mobile-money',
+        'api/collection/card',
+        'api/collection/status',
       ],
     },
     {

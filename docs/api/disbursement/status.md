@@ -23,60 +23,57 @@ GET https://api.payangel.com/v1/disbursements/{transaction_id}
 
 ## Response
 
-### Success Response
+The response format for checking transaction status is as follows:
 
 ```json
 {
-  "status": "success",
-  "message": "Transaction details retrieved successfully",
-  "data": {
-    "transaction_id": "txn_123456789",
-    "reference": "your-reference",
-    "amount": 1000,
-    "fee": 10,
-    "total": 1010,
-    "currency": "GHS",
-    "status": "COMPLETED",
-    "destination_type": "bank_account",
-    "recipient": {
-      "name": "John Doe",
-      "email": "john.doe@example.com",
-      "phone": "+233501234567",
-      "bank_code": "GH123456",
-      "account_number": "1234567890"
+  "code": "0016-001",
+  "message": "The transaction is pending",
+  "details": {
+    "status": "PENDING",
+    "transactionId": "PA-76492c33-0f51-4065-8ec5-4f90e24e-1",
+    "reference_id": "STA-100000603392",
+    "providerResponse": {
+      "uniqueId": "PA53aa509b_146366e3081d47",
+      "creditAccount": "12345655",
+      "amounts": "10.00",
+      "status": "Pending",
+      "message": "Transaction is being processed",
+      "createdDate": "4/2/2025 9:53:16 AM"
     },
-    "narration": "Salary payment",
-    "created_at": "2023-06-15T14:30:00Z",
-    "updated_at": "2023-06-15T15:30:00Z",
-    "completed_at": "2023-06-15T15:30:00Z"
+    "provider": "MDW-CBG",
+    "providerTransactionreference": "PA53aa509b_146366e3081d47"
   }
 }
 ```
 
-### Error Response
+### Response Fields
 
-```json
-{
-  "status": "error",
-  "message": "Transaction not found",
-  "errors": [
-    {
-      "field": "transaction_id",
-      "message": "Transaction with ID txn_123456789 not found"
-    }
-  ]
-}
-```
+| Field | Description |
+|-------|-------------|
+| `code` | Transaction code indicating whether the transaction was successful or not |
+| `message` | Description of the transaction code |
+| `details.status` | Transaction status (SUCCESS, FAILURE, PENDING, or RETRY) |
+| `details.transactionId` | The transaction ID |
+| `details.reference_id` | Additional unique reference for the transaction |
+| `details.providerResponse` | Optional key-value pair. Only available to PayAngel |
+| `details.provider` | The 3rd party provider used to fulfill the request. Only available to PayAngel |
+| `details.providerTransactionreference` | The provider's reference ID |
 
-## Transaction Status Values
+## Transaction Status Codes
 
-| Status | Description |
-|--------|-------------|
-| `PENDING` | Transaction has been received and is pending processing |
-| `PROCESSING` | Transaction is currently being processed |
-| `COMPLETED` | Transaction has been successfully completed |
-| `FAILED` | Transaction has failed |
-| `CANCELLED` | Transaction has been cancelled |
+| Code | Message |
+|------|---------|
+| 0016-000 | The operation was successful |
+| 0016-001 | The transaction is pending |
+| E0016-001 | The operation was unsuccessful |
+| E0016-002 | The reference Id provided may not be valid |
+| E0016-003 | The transaction was not found |
+| E0016-004 | Unable to fulfill the request now. Try again later |
+| E0016-005 | The transaction was found but not processed yet |
+| E0016-006 | The service is currently unavailable |  
+| E0016-007 | Insufficient funds |
+| V0016-005 | The transaction Id is empty or not valid. Only numbers, letters, underscores, and hyphens are allowed |
 
 ## Example Requests
 
@@ -102,7 +99,7 @@ async function checkTransactionStatus(transactionId) {
   }
 }
 
-checkTransactionStatus('txn_123456789');
+checkTransactionStatus('PA-76492c33-0f51-4065-8ec5-4f90e24e-1');
 ```
 
 ### TypeScript
@@ -110,45 +107,33 @@ checkTransactionStatus('txn_123456789');
 ```typescript
 import axios from 'axios';
 
-interface Recipient {
-  name: string;
-  email?: string;
-  phone: string;
-  bank_code?: string;
-  account_number?: string;
-  mobile_network?: string;
-  mobile_number?: string;
-}
-
-interface TransactionResponse {
-  transaction_id: string;
-  reference: string;
-  amount: number;
-  fee: number;
-  total: number;
-  currency: string;
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
-  destination_type: string;
-  recipient: Recipient;
-  narration: string;
-  created_at: string;
-  updated_at: string;
-  completed_at?: string;
-}
-
-interface ApiResponse {
-  status: 'success' | 'error';
+interface ProviderResponse {
+  uniqueId: string;
+  creditAccount: string;
+  amounts: string;
+  status: string;
   message: string;
-  data?: TransactionResponse;
-  errors?: Array<{
-    field: string;
-    message: string;
-  }>;
+  createdDate: string;
 }
 
-async function checkTransactionStatus(transactionId: string): Promise<ApiResponse> {
+interface TransactionDetails {
+  status: 'SUCCESS' | 'FAILURE' | 'PENDING' | 'RETRY';
+  transactionId: string;
+  reference_id: string;
+  providerResponse?: ProviderResponse;
+  provider?: string;
+  providerTransactionreference?: string;
+}
+
+interface TransactionStatusResponse {
+  code: string;
+  message: string;
+  details: TransactionDetails;
+}
+
+async function checkTransactionStatus(transactionId: string): Promise<TransactionStatusResponse> {
   try {
-    const response = await axios.get<ApiResponse>(
+    const response = await axios.get<TransactionStatusResponse>(
       `https://api.payangel.com/v1/disbursements/${transactionId}`,
       {
         headers: {
@@ -169,11 +154,10 @@ async function checkTransactionStatus(transactionId: string): Promise<ApiRespons
   }
 }
 
-checkTransactionStatus('txn_123456789')
+checkTransactionStatus('PA-76492c33-0f51-4065-8ec5-4f90e24e-1')
   .then(data => {
-    if (data.status === 'success' && data.data) {
-      console.log(`Transaction status: ${data.data.status}`);
-    }
+    console.log(`Transaction status: ${data.details.status}`);
+    console.log(`Message: ${data.message}`);
   })
   .catch(error => console.error('Failed to check status:', error));
 ```
@@ -190,43 +174,31 @@ import (
 	"net/http"
 )
 
-type Recipient struct {
-	Name          string `json:"name"`
-	Email         string `json:"email,omitempty"`
-	Phone         string `json:"phone"`
-	BankCode      string `json:"bank_code,omitempty"`
-	AccountNumber string `json:"account_number,omitempty"`
-	MobileNetwork string `json:"mobile_network,omitempty"`
-	MobileNumber  string `json:"mobile_number,omitempty"`
+type ProviderResponse struct {
+	UniqueID      string `json:"uniqueId"`
+	CreditAccount string `json:"creditAccount"`
+	Amounts       string `json:"amounts"`
+	Status        string `json:"status"`
+	Message       string `json:"message"`
+	CreatedDate   string `json:"createdDate"`
 }
 
-type TransactionResponse struct {
-	TransactionID   string    `json:"transaction_id"`
-	Reference       string    `json:"reference"`
-	Amount          float64   `json:"amount"`
-	Fee             float64   `json:"fee"`
-	Total           float64   `json:"total"`
-	Currency        string    `json:"currency"`
-	Status          string    `json:"status"`
-	DestinationType string    `json:"destination_type"`
-	Recipient       Recipient `json:"recipient"`
-	Narration       string    `json:"narration"`
-	CreatedAt       string    `json:"created_at"`
-	UpdatedAt       string    `json:"updated_at"`
-	CompletedAt     string    `json:"completed_at,omitempty"`
+type TransactionDetails struct {
+	Status                      string           `json:"status"`
+	TransactionID               string           `json:"transactionId"`
+	ReferenceID                 string           `json:"reference_id"`
+	ProviderResponse            *ProviderResponse `json:"providerResponse,omitempty"`
+	Provider                    string           `json:"provider,omitempty"`
+	ProviderTransactionreference string           `json:"providerTransactionreference,omitempty"`
 }
 
-type ApiResponse struct {
-	Status  string             `json:"status"`
+type TransactionStatusResponse struct {
+	Code    string             `json:"code"`
 	Message string             `json:"message"`
-	Data    *TransactionResponse `json:"data,omitempty"`
-	Errors  []struct {
-		Field   string `json:"field"`
-		Message string `json:"message"`
-	} `json:"errors,omitempty"`
+	Details TransactionDetails `json:"details"`
 }
 
-func checkTransactionStatus(transactionID, apiKey string) (*ApiResponse, error) {
+func checkTransactionStatus(transactionID, apiKey string) (*TransactionStatusResponse, error) {
 	url := fmt.Sprintf("https://api.payangel.com/v1/disbursements/%s", transactionID)
 	
 	// Create a new request
@@ -253,17 +225,8 @@ func checkTransactionStatus(transactionID, apiKey string) (*ApiResponse, error) 
 		return nil, fmt.Errorf("error reading response: %w", err)
 	}
 	
-	// Handle non-200 responses
-	if resp.StatusCode != http.StatusOK {
-		var errResp ApiResponse
-		if err := json.Unmarshal(body, &errResp); err != nil {
-			return nil, fmt.Errorf("error parsing error response: %w", err)
-		}
-		return &errResp, fmt.Errorf("API error: %s", errResp.Message)
-	}
-	
 	// Parse response
-	var response ApiResponse
+	var response TransactionStatusResponse
 	if err := json.Unmarshal(body, &response); err != nil {
 		return nil, fmt.Errorf("error parsing response: %w", err)
 	}
@@ -273,7 +236,7 @@ func checkTransactionStatus(transactionID, apiKey string) (*ApiResponse, error) 
 
 func main() {
 	apiKey := "your_api_key_here"
-	transactionID := "txn_123456789"
+	transactionID := "PA-76492c33-0f51-4065-8ec5-4f90e24e-1"
 	
 	response, err := checkTransactionStatus(transactionID, apiKey)
 	if err != nil {
@@ -281,17 +244,10 @@ func main() {
 		return
 	}
 	
-	if response.Status == "success" && response.Data != nil {
-		fmt.Printf("Transaction status: %s\n", response.Data.Status)
-		fmt.Printf("Amount: %.2f %s\n", response.Data.Amount, response.Data.Currency)
-		fmt.Printf("Created at: %s\n", response.Data.CreatedAt)
-		if response.Data.CompletedAt != "" {
-			fmt.Printf("Completed at: %s\n", response.Data.CompletedAt)
-		}
-	} else {
-		fmt.Printf("Error: %s\n", response.Message)
-		for _, err := range response.Errors {
-			fmt.Printf("- %s: %s\n", err.Field, err.Message)
-		}
-	}
+	fmt.Printf("Code: %s\n", response.Code)
+	fmt.Printf("Message: %s\n", response.Message)
+	fmt.Printf("Status: %s\n", response.Details.Status)
+	fmt.Printf("Transaction ID: %s\n", response.Details.TransactionID)
+	fmt.Printf("Reference ID: %s\n", response.Details.ReferenceID)
 }
+```

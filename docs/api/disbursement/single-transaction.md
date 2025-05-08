@@ -17,29 +17,36 @@ POST https://api.payangel.com/v1/disbursements/single
 
 ## Request Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `reference` | string | Yes | Your unique reference for this transaction |
-| `amount` | number | Yes | Amount to be transferred |
-| `currency` | string | Yes | Currency code (e.g., GHS, NGN, USD) |
-| `source_account` | string | Yes | Your PayAngel account to debit |
-| `destination_type` | string | Yes | Type of destination (`bank_account`, `mobile_money`, `cash_pickup`) |
-| `recipient` | object | Yes | Recipient information |
-| `narration` | string | Yes | Purpose of the transfer |
-| `callback_url` | string | No | URL to receive status updates via webhook |
-
-### Recipient Object
-
 | Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Recipient's full name |
-| `email` | string | No | Recipient's email address |
-| `phone` | string | Yes | Recipient's phone number |
-| `address` | string | No | Recipient's physical address |
-| `bank_code` | string | Conditional | Required for bank transfers |
-| `account_number` | string | Conditional | Required for bank transfers |
-| `mobile_network` | string | Conditional | Required for mobile money transfers |
-| `mobile_number` | string | Conditional | Required for mobile money transfers |
+|-----------|------|----------|-------------|
+| `transactionId` | string | Yes | Unique ID for payout transaction |
+| `senderFirstName` | string | Yes | The first name of the sender |
+| `senderMiddlename` | string | No | The middle name of the sender |
+| `senderLastName` | string | Yes | The last name of the sender |
+| `senderPhone` | string | No | Phone number of the sender |
+| `countryTo` | string | Yes | The destination ISO country code. e.g. GH |
+| `countryFrom` | string | Yes | The origination ISO country code. e.g. US |
+| `sendingCurrency` | string | Yes | The currency code of the sender e.g. USD |
+| `receivingCurrency` | string | Yes | The currency code of the receiver e.g. GHS |
+| `destinationAmount` | Number | Yes | The amount to be sent to receiver |
+| `beneficiaryFirstName` | string | Yes | The beneficiary first name |
+| `beneficiaryMiddleName` | string | No | The beneficiary middle name |
+| `beneficiaryLastName` | string | Yes | The beneficiary last name |
+| `transferType` | string | Yes | The type of transaction. Possible values are: Mobile or Bank |
+| `bankAccountNumber` | string | No* | The recipient bank account number |
+| `bankName` | string | No* | The recipient bank name |
+| `bankBranch` | string | No* | The recipient bank branch |
+| `bankCode` | string | No* | The recipient bank code. [See Bank Codes](/docs/api/disbursement/bank-codes) for list of PayAngel bank codes |
+| `mobileNetwork` | string | No** | The beneficiary mobile money network |
+| `mobileNumber` | string | No** | The beneficiary mobile money number |
+| `transferReason` | string | Yes | The reason for the payout |
+| `callbackurl` | string | No | The callback URL to receive response customer |
+| `ref` | string | Yes | The sender/customer reference number |
+| `purposeDetails` | string | No | Additional details about the transaction |
+
+\* *When the transferType is Bank, the bankAccountNumber, bankName, bankBranch and bankCode are required.*  
+\** *When the transferType is Mobile, the mobileNetwork and mobileNumber are required.*  
+*The optional fields can be left blank or not included in the request.*
 
 ## Response
 
@@ -71,7 +78,7 @@ POST https://api.payangel.com/v1/disbursements/single
   "message": "Invalid destination account",
   "errors": [
     {
-      "field": "recipient.account_number",
+      "field": "bankAccountNumber",
       "message": "Account number is invalid"
     }
   ]
@@ -90,20 +97,25 @@ const axios = require('axios');
 async function createDisbursement() {
   try {
     const response = await axios.post('https://api.payangel.com/v1/disbursements/single', {
-      reference: 'INV-001-PAYMENT',
-      amount: 1000,
-      currency: 'GHS',
-      source_account: 'acc_123456789',
-      destination_type: 'bank_account',
-      recipient: {
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phone: '+233501234567',
-        bank_code: 'GH123456',
-        account_number: '1234567890'
-      },
-      narration: 'Invoice payment',
-      callback_url: 'https://your-website.com/webhooks/payangel'
+      transactionId: "PAY-123456789",
+      senderFirstName: "John",
+      senderLastName: "Doe",
+      senderPhone: "+16175551234",
+      countryTo: "GH",
+      countryFrom: "US",
+      sendingCurrency: "USD",
+      receivingCurrency: "GHS",
+      destinationAmount: 1000,
+      beneficiaryFirstName: "Jane",
+      beneficiaryLastName: "Smith",
+      transferType: "Bank",
+      bankAccountNumber: "1234567890",
+      bankName: "STANDARD CHARTERED BANK",
+      bankBranch: "HIGH STREET",
+      bankCode: "300302",
+      transferReason: "Family Support",
+      ref: "INV-001-PAYMENT",
+      purposeDetails: "Monthly allowance"
     }, {
       headers: {
         'Authorization': 'Bearer YOUR_API_KEY',
@@ -125,44 +137,55 @@ createDisbursement();
 ```typescript
 import axios from 'axios';
 
-interface Recipient {
-  name: string;
-  email?: string;
-  phone: string;
-  bank_code?: string;
-  account_number?: string;
-  mobile_network?: string;
-  mobile_number?: string;
-}
-
 interface DisbursementRequest {
-  reference: string;
-  amount: number;
-  currency: string;
-  source_account: string;
-  destination_type: 'bank_account' | 'mobile_money' | 'cash_pickup';
-  recipient: Recipient;
-  narration: string;
-  callback_url?: string;
+  transactionId: string;
+  senderFirstName: string;
+  senderMiddlename?: string;
+  senderLastName: string;
+  senderPhone?: string;
+  countryTo: string;
+  countryFrom: string;
+  sendingCurrency: string;
+  receivingCurrency: string;
+  destinationAmount: number;
+  beneficiaryFirstName: string;
+  beneficiaryMiddleName?: string;
+  beneficiaryLastName: string;
+  transferType: 'Bank' | 'Mobile';
+  bankAccountNumber?: string;
+  bankName?: string;
+  bankBranch?: string;
+  bankCode?: string;
+  mobileNetwork?: string;
+  mobileNumber?: string;
+  transferReason: string;
+  callbackurl?: string;
+  ref: string;
+  purposeDetails?: string;
 }
 
 async function createDisbursement() {
   try {
     const requestData: DisbursementRequest = {
-      reference: 'INV-001-PAYMENT',
-      amount: 1000,
-      currency: 'GHS',
-      source_account: 'acc_123456789',
-      destination_type: 'bank_account',
-      recipient: {
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phone: '+233501234567',
-        bank_code: 'GH123456',
-        account_number: '1234567890'
-      },
-      narration: 'Invoice payment',
-      callback_url: 'https://your-website.com/webhooks/payangel'
+      transactionId: "PAY-123456789",
+      senderFirstName: "John",
+      senderLastName: "Doe",
+      senderPhone: "+16175551234",
+      countryTo: "GH",
+      countryFrom: "US",
+      sendingCurrency: "USD",
+      receivingCurrency: "GHS",
+      destinationAmount: 1000,
+      beneficiaryFirstName: "Jane",
+      beneficiaryLastName: "Smith",
+      transferType: "Bank",
+      bankAccountNumber: "1234567890",
+      bankName: "STANDARD CHARTERED BANK",
+      bankBranch: "HIGH STREET",
+      bankCode: "300302",
+      transferReason: "Family Support",
+      ref: "INV-001-PAYMENT",
+      purposeDetails: "Monthly allowance"
     };
     
     const response = await axios.post(
@@ -198,42 +221,52 @@ import (
 	"net/http"
 )
 
-type Recipient struct {
-	Name          string `json:"name"`
-	Email         string `json:"email,omitempty"`
-	Phone         string `json:"phone"`
-	BankCode      string `json:"bank_code,omitempty"`
-	AccountNumber string `json:"account_number,omitempty"`
-}
-
 type DisbursementRequest struct {
-	Reference       string    `json:"reference"`
-	Amount          float64   `json:"amount"`
-	Currency        string    `json:"currency"`
-	SourceAccount   string    `json:"source_account"`
-	DestinationType string    `json:"destination_type"`
-	Recipient       Recipient `json:"recipient"`
-	Narration       string    `json:"narration"`
-	CallbackURL     string    `json:"callback_url,omitempty"`
+	TransactionId        string  `json:"transactionId"`
+	SenderFirstName      string  `json:"senderFirstName"`
+	SenderMiddlename     string  `json:"senderMiddlename,omitempty"`
+	SenderLastName       string  `json:"senderLastName"`
+	SenderPhone          string  `json:"senderPhone,omitempty"`
+	CountryTo            string  `json:"countryTo"`
+	CountryFrom          string  `json:"countryFrom"`
+	SendingCurrency      string  `json:"sendingCurrency"`
+	ReceivingCurrency    string  `json:"receivingCurrency"`
+	DestinationAmount    float64 `json:"destinationAmount"`
+	BeneficiaryFirstName string  `json:"beneficiaryFirstName"`
+	BeneficiaryMiddleName string `json:"beneficiaryMiddleName,omitempty"`
+	BeneficiaryLastName  string  `json:"beneficiaryLastName"`
+	TransferType         string  `json:"transferType"`
+	BankAccountNumber    string  `json:"bankAccountNumber,omitempty"`
+	BankName             string  `json:"bankName,omitempty"`
+	BankBranch           string  `json:"bankBranch,omitempty"`
+	BankCode             string  `json:"bankCode,omitempty"`
+	TransferReason       string  `json:"transferReason"`
+	Ref                  string  `json:"ref"`
+	PurposeDetails       string  `json:"purposeDetails,omitempty"`
 }
 
 func main() {
 	// Create request payload
 	requestData := DisbursementRequest{
-		Reference:       "INV-001-PAYMENT",
-		Amount:          1000,
-		Currency:        "GHS",
-		SourceAccount:   "acc_123456789",
-		DestinationType: "bank_account",
-		Recipient: Recipient{
-			Name:          "John Doe",
-			Email:         "john.doe@example.com",
-			Phone:         "+233501234567",
-			BankCode:      "GH123456",
-			AccountNumber: "1234567890",
-		},
-		Narration:   "Invoice payment",
-		CallbackURL: "https://your-website.com/webhooks/payangel",
+		TransactionId:        "PAY-123456789",
+		SenderFirstName:      "John",
+		SenderLastName:       "Doe",
+		SenderPhone:          "+16175551234",
+		CountryTo:            "GH",
+		CountryFrom:          "US",
+		SendingCurrency:      "USD",
+		ReceivingCurrency:    "GHS",
+		DestinationAmount:    1000,
+		BeneficiaryFirstName: "Jane",
+		BeneficiaryLastName:  "Smith",
+		TransferType:         "Bank",
+		BankAccountNumber:    "1234567890",
+		BankName:             "STANDARD CHARTERED BANK",
+		BankBranch:           "HIGH STREET",
+		BankCode:             "300302",
+		TransferReason:       "Family Support",
+		Ref:                  "INV-001-PAYMENT",
+		PurposeDetails:       "Monthly allowance",
 	}
 
 	// Convert to JSON
@@ -297,20 +330,25 @@ public class PayAngelDisbursement {
 
             // Create JSON payload
             String jsonPayload = "{"
-                + "\"reference\": \"INV-001-PAYMENT\","
-                + "\"amount\": 1000,"
-                + "\"currency\": \"GHS\","
-                + "\"source_account\": \"acc_123456789\","
-                + "\"destination_type\": \"bank_account\","
-                + "\"recipient\": {"
-                + "  \"name\": \"John Doe\","
-                + "  \"email\": \"john.doe@example.com\","
-                + "  \"phone\": \"+233501234567\","
-                + "  \"bank_code\": \"GH123456\","
-                + "  \"account_number\": \"1234567890\""
-                + "},"
-                + "\"narration\": \"Invoice payment\","
-                + "\"callback_url\": \"https://your-website.com/webhooks/payangel\""
+                + "\"transactionId\": \"PAY-123456789\","
+                + "\"senderFirstName\": \"John\","
+                + "\"senderLastName\": \"Doe\","
+                + "\"senderPhone\": \"+16175551234\","
+                + "\"countryTo\": \"GH\","
+                + "\"countryFrom\": \"US\","
+                + "\"sendingCurrency\": \"USD\","
+                + "\"receivingCurrency\": \"GHS\","
+                + "\"destinationAmount\": 1000,"
+                + "\"beneficiaryFirstName\": \"Jane\","
+                + "\"beneficiaryLastName\": \"Smith\","
+                + "\"transferType\": \"Bank\","
+                + "\"bankAccountNumber\": \"1234567890\","
+                + "\"bankName\": \"STANDARD CHARTERED BANK\","
+                + "\"bankBranch\": \"HIGH STREET\","
+                + "\"bankCode\": \"300302\","
+                + "\"transferReason\": \"Family Support\","
+                + "\"ref\": \"INV-001-PAYMENT\","
+                + "\"purposeDetails\": \"Monthly allowance\""
                 + "}";
 
             // Write payload to connection
@@ -348,19 +386,23 @@ const axios = require('axios');
 async function createMobileMoneyDisbursement() {
   try {
     const response = await axios.post('https://api.payangel.com/v1/disbursements/single', {
-      reference: 'MOMO-PAYMENT-001',
-      amount: 500,
-      currency: 'GHS',
-      source_account: 'acc_123456789',
-      destination_type: 'mobile_money',
-      recipient: {
-        name: 'Jane Smith',
-        phone: '+233507654321',
-        mobile_network: 'MTN',
-        mobile_number: '0507654321'
-      },
-      narration: 'Mobile money transfer',
-      callback_url: 'https://your-website.com/webhooks/payangel'
+      transactionId: "PAY-987654321",
+      senderFirstName: "John",
+      senderLastName: "Doe",
+      senderPhone: "+16175551234",
+      countryTo: "GH",
+      countryFrom: "US",
+      sendingCurrency: "USD",
+      receivingCurrency: "GHS",
+      destinationAmount: 500,
+      beneficiaryFirstName: "Jane",
+      beneficiaryLastName: "Smith",
+      transferType: "Mobile",
+      mobileNetwork: "MTN",
+      mobileNumber: "0551234567",
+      transferReason: "Gift",
+      ref: "MOMO-PAYMENT-001",
+      purposeDetails: "Birthday gift"
     }, {
       headers: {
         'Authorization': 'Bearer YOUR_API_KEY',

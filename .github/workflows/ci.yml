@@ -1,12 +1,9 @@
-name: Deploy to GitHub Pages
+name: Documentation CI
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -28,10 +25,11 @@ jobs:
       - name: Run tests
         run: pnpm test:all
         
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Build documentation (verify build)
+        run: pnpm build
+
+  link-check:
+    name: Check Documentation Links
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -45,14 +43,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-      
-      - name: Build website
-        run: pnpm build
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          user_name: github-actions[bot]
-          user_email: 41898282+github-actions[bot]@users.noreply.github.com
+        
+      - name: Check markdown links
+        run: pnpm lint:md
