@@ -28,6 +28,8 @@ All API requests require authentication using API keys. You can obtain your API 
 
 Whenever you submit a request through our API, we will intelligently select the most suitable provider to fulfill the request. This selection is based on factors like cost-effectiveness, speed, and reliability of the providers. Our system keeps track of the provider used to fulfill your request, making it easy for you to query transaction status in the future.
 
+![PayConnect Flow Diagram](../../static/img/PayConnect%20Flow.png)
+
 ## Features
 
 ### Disbursement
