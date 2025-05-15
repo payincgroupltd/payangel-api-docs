@@ -21,6 +21,14 @@ describe('Documentation Structure Tests', () => {
       'docs/api/collection/mobile-money.md',
       'docs/api/collection/card.md',
       'docs/api/collection/status.md',
+      
+      // Cash Pickup API files
+      'docs/api/cash-pickup/overview.md',
+      'docs/api/cash-pickup/authentication.md',
+      'docs/api/cash-pickup/claim-transaction.md',
+      'docs/api/cash-pickup/verify-identity.md',
+      'docs/api/cash-pickup/payout.md',
+      'docs/api/cash-pickup/abort.md',
     ];
 
     for (const file of requiredFiles) {
