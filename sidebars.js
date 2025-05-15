@@ -40,6 +40,18 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Cash Pickup API',
+      items: [
+        'api/cash-pickup/overview',
+        'api/cash-pickup/authentication',
+        'api/cash-pickup/claim-transaction',
+        'api/cash-pickup/verify-identity',
+        'api/cash-pickup/payout',
+        'api/cash-pickup/abort',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Code Samples',
       items: [
         'api/javascript/examples',
