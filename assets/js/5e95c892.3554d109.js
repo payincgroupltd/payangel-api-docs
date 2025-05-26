@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkpayangel_api_docs=self.webpackChunkpayangel_api_docs||[]).push([[647],{8946:(e,a,s)=>{s.r(a),s.d(a,{default:()=>d});s(758);var r=s(3526),c=s(2316),n=s(4048),p=s(289),u=s(1113),l=s(6070);function d(e){return(0,l.jsx)(c.e3,{className:(0,r.A)(n.G.wrapper.docsPages),children:(0,l.jsx)(u.A,{children:(0,p.v)(e.route.routes)})})}}}]);
