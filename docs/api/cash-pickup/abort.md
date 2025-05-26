@@ -51,25 +51,17 @@ A successful response will confirm that the transaction was aborted:
 {
   "AbortPayout": {
     "ResponseHeader": {
-      "ResponseCode": "000",
-      "ResponseMessage": "Success"
+      "ResultCode": "00000001",
+      "ResultDescription": "Transaction aborted successfully"
     },
-    "ResponseBody": {
-      "trans_ref": "PC10007424",
-      "abort_status": "COMPLETED",
-      "abort_time": "2025-05-09T12:30:45"
-    }
+    "ResponseBody": "Transaction aborted successfully"
   }
 }
 ```
 
 ### Response Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `trans_ref` | String | Reference for the transaction |
-| `abort_status` | String | Status of the abort operation (COMPLETED, FAILED) |
-| `abort_time` | String | Date and time when the transaction was aborted (UTC) |
+The response body contains a simple success message confirming that the transaction has been aborted successfully.
 
 ## Abort Reason Types
 

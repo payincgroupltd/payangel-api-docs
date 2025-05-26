@@ -49,22 +49,44 @@ A successful response will include details about the transaction and beneficiary
 {
   "PullTransaction": {
     "ResponseHeader": {
-      "ResponseCode": "000",
-      "ResponseMessage": "Success"
+      "ResultCode": "00000001",
+      "ResultDescription": "Transaction has been locked for processing by Teller #AG1001"
     },
     "ResponseBody": {
-      "trans_details": {
-        "trans_ref": "PC10007429",
-        "pccn": "CDZ9N40P",
-        "sender_name": "John Doe",
-        "sender_country": "United Kingdom",
-        "beneficiary_name": "Jane Smith",
-        "amount": "500.00",
-        "currency": "GHS",
-        "status": "READY",
-        "expected_id_type": "NATIONAL_ID,PASSPORT,DRIVING_LICENSE",
-        "created_date": "2025-05-01T10:15:23",
-        "expiry_date": "2025-06-01T10:15:23"
+      "senderInfo": {
+        "first_name": "Myy",
+        "middle_name": "",
+        "last_name": "Angely",
+        "email": "jamegbor12@gmail.com",
+        "mobile_number": "+447412202321",
+        "address": "Test_AE5 Northfleet",
+        "remitter_address2": "Northfleet",
+        "country": "gb",
+        "state": "Kent",
+        "city": "Dartford"
+      },
+      "receiverInfo": {
+        "fname": "Adwoa",
+        "mname": "Esi",
+        "lname": "Annan",
+        "mobile": "+233264476387",
+        "city": "Accra",
+        "country": "gh",
+        "relationship": "Myself"
+      },
+      "transactionInfo": {
+        "source_country": "gb",
+        "destination_country": "gh",
+        "created_date": "2025-05-09 09:44:56",
+        "reason_remittance": "Charity",
+        "source_amount": "5",
+        "source_currency": "GBP",
+        "destination_amount": "25.4305",
+        "destination_currency": "GHS"
+      },
+      "claimExpiry": {
+        "expiryIn": 600,
+        "unit": "seconds"
       }
     }
   }
@@ -73,19 +95,48 @@ A successful response will include details about the transaction and beneficiary
 
 ### Response Fields
 
+#### senderInfo
 | Field | Type | Description |
 |-------|------|-------------|
-| `trans_ref` | String | Unique reference for the transaction |
-| `pccn` | String | Personal Collection Code Number |
-| `sender_name` | String | Name of the person who sent the money |
-| `sender_country` | String | Country of the sender |
-| `beneficiary_name` | String | Name of the beneficiary who will receive the money |
-| `amount` | String | Amount to be paid out |
-| `currency` | String | Currency code of the payout amount |
-| `status` | String | Current status of the transaction |
-| `expected_id_type` | String | Comma-separated list of accepted ID types for verification |
-| `created_date` | String | Date and time when the transaction was created (UTC) |
-| `expiry_date` | String | Date and time when the transaction expires (UTC) |
+| `first_name` | String | Sender's first name |
+| `middle_name` | String | Sender's middle name (may be empty) |
+| `last_name` | String | Sender's last name |
+| `email` | String | Sender's email address |
+| `mobile_number` | String | Sender's mobile number |
+| `address` | String | Sender's primary address |
+| `remitter_address2` | String | Sender's secondary address |
+| `country` | String | Sender's country code |
+| `state` | String | Sender's state/region |
+| `city` | String | Sender's city |
+
+#### receiverInfo
+| Field | Type | Description |
+|-------|------|-------------|
+| `fname` | String | Receiver's first name |
+| `mname` | String | Receiver's middle name |
+| `lname` | String | Receiver's last name |
+| `mobile` | String | Receiver's mobile number |
+| `city` | String | Receiver's city |
+| `country` | String | Receiver's country code |
+| `relationship` | String | Relationship to sender |
+
+#### transactionInfo
+| Field | Type | Description |
+|-------|------|-------------|
+| `source_country` | String | Origin country code |
+| `destination_country` | String | Destination country code |
+| `created_date` | String | Transaction creation date and time |
+| `reason_remittance` | String | Purpose of the remittance |
+| `source_amount` | String | Amount in source currency |
+| `source_currency` | String | Source currency code |
+| `destination_amount` | String | Amount in destination currency |
+| `destination_currency` | String | Destination currency code |
+
+#### claimExpiry
+| Field | Type | Description |
+|-------|------|-------------|
+| `expiryIn` | Integer | Time until claim expires |
+| `unit` | String | Time unit (seconds) |
 
 ## Error Codes
 

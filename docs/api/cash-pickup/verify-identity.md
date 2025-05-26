@@ -63,25 +63,17 @@ A successful response will confirm that the identity verification was processed:
 {
   "ConfirmBenefIdentity": {
     "ResponseHeader": {
-      "ResponseCode": "000",
-      "ResponseMessage": "Success"
+      "ResultCode": "00000001",
+      "ResultDescription": "Identity details submitted successfully"
     },
-    "ResponseBody": {
-      "trans_ref": "PC10007428",
-      "verification_status": "SUCCESSFUL",
-      "next_step": "PAYOUT"
-    }
+    "ResponseBody": "Identity details submitted successfully"
   }
 }
 ```
 
 ### Response Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `trans_ref` | String | Reference for the transaction |
-| `verification_status` | String | Status of the identity verification (SUCCESSFUL, FAILED) |
-| `next_step` | String | The next step in the process (PAYOUT, ABORT) |
+The response body contains a simple success message confirming that the identity details have been submitted successfully.
 
 ## ID Types
 

@@ -1,0 +1,64 @@
+name: Build docs
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: payangel-api-docs
+  KUBE_NAMESPACE: documentation
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.AZURE_REGISTRY }}
+          username: ${{ secrets.AZURE_APP_ID }}
+          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate Build ID
+        id: build-id
+        run: echo "::set-output name=id::$(date +'%Y%m%d%H%M%S')-${GITHUB_SHA::8}"
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.AZURE_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ secrets.AZURE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.build-id.outputs.id }}
+          cache-from: type=registry,ref=${{ secrets.AZURE_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-to: type=inline
+
+# - name: Set up kubectl
+#   uses: azure/k8s-set-context@v3
+#   with:
+#     kubeconfig: ${{ secrets.KUBE_CONFIG }}
+#
+# - name: Deploy to Kubernetes
+#   run: |
+#     # Replace placeholder in deployment.yaml
+#     sed -i "s|\${CONTAINER_REGISTRY}|${{ env.CONTAINER_REGISTRY }}|g" kubernetes/deployment.yaml
+#     sed -i "s|\${IMAGE_TAG}|${{ steps.build-id.outputs.id }}|g" kubernetes/deployment.yaml
+#
+#     # Apply Kubernetes manifests
+#     kubectl apply -f kubernetes/configmap.yaml -n ${{ env.KUBE_NAMESPACE }}
+#     kubectl apply -f kubernetes/deployment.yaml -n ${{ env.KUBE_NAMESPACE }}
+#     kubectl apply -f kubernetes/service.yaml -n ${{ env.KUBE_NAMESPACE }}
+#
+#     # Wait for deployment to roll out
+#     kubectl rollout status deployment/payangel-api-docs -n ${{ env.KUBE_NAMESPACE }} --timeout=300s
