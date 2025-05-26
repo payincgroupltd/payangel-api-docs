@@ -42,12 +42,12 @@ A successful response will include a token that must be used in all subsequent A
 {
   "UserAuthentication": {
     "ResponseHeader": {
-      "ResponseCode": "000",
-      "ResponseMessage": "Success"
+      "ResultCode": "00000001",
+      "ResultDescription": "Login succeeded"
     },
     "ResponseBody": {
-      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-      "expiry_time": "2025-05-09T13:45:06"
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyiQUcxMDAxIn0.FWcA5KvRLDWdWkx6opffUn3Pk4ihfpm1O_zDMrkWPMA",
+      "expiresIn": 3600
     }
   }
 }
@@ -58,7 +58,7 @@ A successful response will include a token that must be used in all subsequent A
 | Field | Type | Description |
 |-------|------|-------------|
 | `token` | String | JWT token to be used in all subsequent API calls |
-| `expiry_time` | String | The expiration date and time of the token (UTC) |
+| `expiresIn` | Integer | The expiration time of the token in seconds (3600 = 1 hour) |
 
 ## Using the Token
 
@@ -82,3 +82,4 @@ The token must be included in the `SessionIdentity` section of the request heade
 ## Token Lifespan
 
 The authentication token is valid for 60 minutes from the time it is issued. After expiry, a new token must be obtained by calling the authentication endpoint again.
+

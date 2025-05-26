@@ -55,27 +55,17 @@ A successful response will confirm that the payout was completed:
 {
   "PayBeneficiary": {
     "ResponseHeader": {
-      "ResponseCode": "000",
-      "ResponseMessage": "Success"
+      "ResultCode": "00000001",
+      "ResultDescription": "Transaction paid out successfully"
     },
-    "ResponseBody": {
-      "trans_ref": "PC10007428",
-      "payout_status": "COMPLETED",
-      "payout_time": "2025-05-09T11:45:23",
-      "receipt_number": "RCP9087654321"
-    }
+    "ResponseBody": "Transaction paid out successfully"
   }
 }
 ```
 
 ### Response Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `trans_ref` | String | Reference for the transaction |
-| `payout_status` | String | Status of the payout (COMPLETED, FAILED) |
-| `payout_time` | String | Date and time when the payout was completed (UTC) |
-| `receipt_number` | String | Unique receipt number for the transaction |
+The response body contains a simple success message confirming that the transaction has been paid out successfully.
 
 ## Error Codes
 
